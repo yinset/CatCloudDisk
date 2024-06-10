@@ -3,7 +3,7 @@
 
 登陆界面
 
-![image](https://github.com/yinset/CatCloudDisk/assets/80797110/7d0c954b-f660-4674-a223-b7a94a153a24)
+![捕获](https://github.com/yinset/CatCloudDisk/assets/80797110/d42dc13d-e032-4f61-8e6f-17bad56489be)
 
 主页
 
