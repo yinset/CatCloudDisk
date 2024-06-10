@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icu.niunai.mapper.UserMapper">
+    <select id="selectUser" resultMap="StarMap">
+        select * from user_info
+        <where>
+            <if test="userId != 0">
+                user_id = #{userId}
+            </if>
+            <if test="email != null">
+                and email = #{email}
+            </if>
+            <if test="isAdmin != 0">
+                and is_admin = #{isAdmin}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectUsers" resultMap="SessionUserMap">
+        select user_id,email,nick_name,is_admin,avatar_path,birthday,use_space,total_space,ban from user_info
+        <where>
+            <if test="isAdmin!=0">
+                is_admin = #{isAdmin}
+            </if>
+            <if test="userId != 0">
+                and user_id != #{userId}
+            </if>
+        </where>
+    </select>
+
+    <sql id="key">
+        <trim suffixOverrides=",">
+            <if test="nickName != null">
+                nick_name,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="birthday != null">
+                birthday,
+            </if>
+        </trim>
+    </sql>
+    <sql id="values">
+        <trim suffixOverrides=",">
+            <if test="nickName != null">
+                #{nickName},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="password != null">
+                #{password},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="birthday != null">
+                #{birthday},
+            </if>
+        </trim>
+    </sql>
+    <insert id="insertUser">
+        insert into user_info (<include refid="key"/>)
+        values (<include refid="values"/>)
+    </insert>
+
+    <update id="updateUser">
+        update user_info
+        <set>
+            <if test="nickName != null">
+                nick_name = #{nickName},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="useSpace != 0 and userSpace != null and useSpaceChange==0">
+                use_space = #{useSpace},
+            </if>
+            <if test="useSpaceChange!=0">
+                use_space = use_space + #{useSpaceChange},
+            </if>
+            <if test="totalSpace != 0 and totalSpaceChange == 0">
+                total_space = #{totalSpace},
+            </if>
+            <if test="totalSpaceChange != 0">
+                total_space = total_space + #{totalSpaceChange},
+            </if>
+            <if test="avatarPath != null">
+                avatar_path = #{avatarPath},
+            </if>
+            <if test="ban != 0">
+                ban = #{ban},
+            </if>
+            <if test="isAdmin != 0">
+                is_admin = #{isAdmin},
+            </if>
+        </set>
+        <where>
+            user_id = #{userId}
+        </where>
+    </update>
+
+    <resultMap id="StarMap" type="icu.niunai.entity.po.User">
+        <result column="user_id" property="userId"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="email" property="email"/>
+        <result column="password" property="password"/>
+        <result column="avatar_path" property="avatarPath"/>
+        <result column="create_time" property="createTime"/>
+        <result column="use_space" property="useSpace"/>
+        <result column="total_space" property="totalSpace"/>
+        <result column="ban" property="ban"/>
+        <result column="birthday" property="birthday"/>
+        <result column="is_admin" property="isAdmin"/>
+    </resultMap>
+
+    <resultMap id="SessionUserMap" type="icu.niunai.entity.dto.SessionUser">
+        <result column="user_id" property="userId"/>
+        <result column="email" property="email"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="is_admin" property="isAdmin"/>
+        <result column="avatar_path" property="avatarPath"/>
+        <result column="birthday" property="birthday"/>
+        <result column="use_space" property="useSpace"/>
+        <result column="total_space" property="totalSpace"/>
+        <result column="ban" property="ban"/>
+    </resultMap>
+</mapper>

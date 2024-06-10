@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icu.niunai.mapper.FileMapper">
+
+
+    <select id="selectFile" resultMap="StarMap">
+        select * from file_info
+        <where>
+            <if test="fileId != 0">
+                file_id = #{fileId}
+            </if>
+            <if test="userId != 0">
+                and user_id = #{userId}
+            </if>
+            <if test="fileUid != null and fileUid != 0">
+                and file_uid = #{fileUid}
+            </if>
+            <if test="filePath != null">
+                and file_path = #{filePath}
+            </if>
+            <if test="fileName != null">
+                and file_name = #{fileName}
+            </if>
+            <if test="fileMD5 != null">
+                and file_MD5 = #{fileMD5}
+            </if>
+            <if test="delFlag != 0 and delIndirectFlag == 0">
+                <if test="delFlag == 1">
+                    and del_flag = #{delFlag}
+                </if>
+                <if test="delFlag == -1">
+                    and del_flag = #{delFlag} or recover_flag = 1
+                </if>
+            </if>
+            <if test="delIndirectFlag != 0 and delFlag == 0">
+                <if test="delIndirectFlag == 1">
+                    and del_indirect_flag = #{delIndirectFlag} and recover_flag = -1
+                </if>
+                <if test="delIndirectFlag == -1">
+                    and del_indirect_flag = #{delIndirectFlag} or recover_flag = 1
+                </if>
+            </if>
+            <if test="delFlag == -1 and delIndirectFlag == -1">
+                and ((del_flag = #{delFlag} and del_indirect_flag = #{delIndirectFlag}) or recover_flag = 1)
+            </if>
+            <if test="delFlag == 1 and delIndirectFlag == 1">
+                and ((del_flag = #{delFlag} or del_indirect_flag = #{delIndirectFlag}) and recover_flag = -1)
+            </if>
+
+            <if test="hardDelFlag != 0">
+                and hard_del_flag = #{hardDelFlag}
+            </if>
+            <if test="splitUploadFlag != 0">
+                and split_upload_flag = #{splitUploadFlag}
+            </if>
+            <if test="splitUploadCount != 0">
+                and split_upload_count = #{splitUploadCount}
+            </if>
+            <if test="(fileName!= null and filePath!=null) or fileMD5 != null">
+                limit 1
+            </if>
+        </where>
+    </select>
+
+    <select id="selectFiles" resultMap="selectUserFilesMap">
+        select file_id,file_name,file_size,file_super_id,create_time,folder_type,relative_path,delete_time,del_flag,del_indirect_flag,hard_del_flag from file_info
+        <where>
+            <if test="fileNameLike != null">
+                file_name like #{fileNameLike}
+            </if>
+            <if test="userId != 0">
+                and user_id = #{userId}
+            </if>
+            <if test="folderType != 0">
+                and folder_type = #{folderType}
+            </if>
+            <if test="fileSuperId != 0">
+                and file_super_id = #{fileSuperId}
+            </if>
+            <if test="delFlag != 0 and delIndirectFlag == 0">
+                <if test="delFlag == 1">
+                    and del_flag = #{delFlag}
+                </if>
+                <if test="delFlag == -1">
+                    and del_flag = #{delFlag} or recover_flag = 1
+                </if>
+            </if>
+            <if test="delIndirectFlag != 0 and delFlag == 0">
+                <if test="delIndirectFlag == 1">
+                    and del_indirect_flag = #{delIndirectFlag} and recover_flag = -1
+                </if>
+                <if test="delIndirectFlag == -1">
+                    and del_indirect_flag = #{delIndirectFlag} or recover_flag = 1
+                </if>
+            </if>
+            <if test="delFlag == -1 and delIndirectFlag == -1">
+                and ((del_flag = #{delFlag} and del_indirect_flag = #{delIndirectFlag}) or recover_flag = 1)
+            </if>
+            <if test="delFlag == 1 and delIndirectFlag == 1">
+                and ((del_flag = #{delFlag} or del_indirect_flag = #{delIndirectFlag}) and recover_flag = -1)
+            </if>
+
+            <if test="hardDelFlag != 0">
+                and hard_del_flag = #{hardDelFlag}
+            </if>
+        </where>
+        order by folder_type DESC
+    </select>
+
+    <sql id="key">
+        <trim suffixOverrides=",">
+            <if test="userId != 0">
+                user_id,
+            </if>
+            <if test="fileName!=null">
+                file_name,
+            </if>
+            <if test="fileSize!=0 and fileSize!=null">
+                file_size,
+            </if>
+            <if test="folderType!=0">
+                folder_type,
+            </if>
+            <if test="fileSuperId!=0">
+                file_super_id,
+            </if>
+            <if test="filePath != null">
+                file_path,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="fileUid != null">
+                file_uid,
+            </if>
+            <if test="relativePath != null">
+                relative_path,
+            </if>
+            <if test="fileMD5 != null">
+                file_MD5,
+            </if>
+        </trim>
+    </sql>
+    <sql id="values">
+        <trim suffixOverrides=",">
+            <if test="userId != 0">
+                #{userId},
+            </if>
+            <if test="fileName!=null">
+                #{fileName},
+            </if>
+            <if test="fileSize!=0 and fileSize!=null">
+                #{fileSize},
+            </if>
+            <if test="folderType!=0">
+                #{folderType},
+            </if>
+            <if test="fileSuperId!=0">
+                #{fileSuperId},
+            </if>
+            <if test="filePath != null">
+                #{filePath},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="fileUid != null">
+                #{fileUid},
+            </if>
+            <if test="relativePath != null">
+                #{relativePath},
+            </if>
+            <if test="fileMD5 != null">
+                #{fileMD5},
+            </if>
+        </trim>
+    </sql>
+    <insert id="insertFile">
+        insert into file_info(<include refid="key"/>)
+        values(<include refid="values"/>)
+    </insert>
+
+    <update id="updateFile">
+        update file_info
+        <set>
+            delete_time = #{deleteTime},
+            <if test="delFlag != 0 and delIndirectFlag == 0">
+                del_flag = #{delFlag},recover_flag = -1,
+            </if>
+            <if test="delIndirectFlag != 0 and delFlag == 0">
+                del_indirect_flag = #{delIndirectFlag},recover_flag = -1,
+            </if>
+            <if test="delFlag !=0 and delIndirectFlag != 0">
+                del_flag = #{delFlag},del_indirect_flag = #{delIndirectFlag},recover_flag = -1,
+            </if>
+            <if test="recoverFlag != 0 and delFlag == 0 and delIndirectFlag == 0">
+                recover_flag = #{recoverFlag},
+            </if>
+            <if test="filePath != null and fileId != 0">
+                file_path = #{filePath},
+            </if>
+            <if test="relativePath != null">
+                relative_path = #{relativePath},
+            </if>
+            <if test="fileName != null">
+                file_name = #{fileName},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="fileSuperId!=0">
+                file_super_id = #{fileSuperId},
+            </if>
+            <if test="hardDelFlag != 0">
+                hard_del_flag = #{hardDelFlag},
+            </if>
+            <if test="cyclePath != null">
+                cycle_path = #{cyclePath},
+            </if>
+        </set>
+
+        <where>
+            <if test="fileId != 0">
+                file_id = #{fileId}
+            </if>
+            <if test="filePath != null and fileId == 0">
+                and file_path = #{filePath}
+            </if>
+        </where>
+    </update>
+
+
+    <delete id="deleteFile">
+        delete from file_info
+        <where>
+            file_id = #{fileId}
+            <if test="delFlag != 0 and delIndirectFlag == 0">
+                <if test="delFlag == 1">
+                    and del_flag = #{delFlag} and recover_flag = -1
+                </if>
+                <if test="delFlag == -1">
+                    and del_flag = #{delFlag} or recover_flag = 1
+                </if>
+            </if>
+            <if test="delIndirectFlag != 0 and delFlag == 0">
+                <if test="delIndirectFlag == 1">
+                    and del_indirect_flag = #{delIndirectFlag} and recover_flag = -1
+                </if>
+                <if test="delIndirectFlag == -1">
+                    and del_indirect_flag = #{delIndirectFlag} or recover_flag = 1
+                </if>
+            </if>
+            <if test="delFlag == -1 and delIndirectFlag == -1">
+                and ((del_flag = #{delFlag} and del_indirect_flag = #{delIndirectFlag}) or recover_flag = 1)
+            </if>
+            <if test="delFlag == 1 and delIndirectFlag == 1">
+                and ((del_flag = #{delFlag} or del_indirect_flag = #{delIndirectFlag}) and recover_flag = -1)
+            </if>
+        </where>
+    </delete>
+
+
+    <select id="selectFilePath">
+        select file_path from file_info
+        <where>
+            file_id = #{fileId}
+        </where>
+    </select>
+
+    <resultMap id="selectUserFilesMap" type="icu.niunai.entity.po.File">
+        <result property="fileId" column="file_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="createTime" column="create_time"/>
+        <result property="fileSuperId" column="file_super_id"/>
+        <result property="folderType" column="folder_type"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="delIndirectFlag" column="del_indirect_flag"/>
+        <result property="hardDelFlag" column="hard_del_flag"/>
+        <result property="relativePath" column="relative_path"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+
+    <resultMap id="StarMap" type="icu.niunai.entity.po.File">
+        <result property="fileId" column="file_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="fileSuperId" column="file_super_id"/>
+        <result property="filePath" column="file_path"/>
+        <result property="createTime" column="create_time"/>
+        <result property="folderType" column="folder_type"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="delIndirectFlag" column="del_indirect_flag"/>
+        <result property="hardDelFlag" column="hard_del_flag"/>
+        <result property="recoverFlag" column="recover_flag"/>
+        <result property="fileUid" column="file_uid"/>
+        <result property="relativePath" column="relative_path"/>
+        <result property="cyclePath" column="cycle_path"/>
+        <result property="fileMD5" column="file_md5"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+</mapper>
